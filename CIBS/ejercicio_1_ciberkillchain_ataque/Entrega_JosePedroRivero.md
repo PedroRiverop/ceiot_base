@@ -9,12 +9,12 @@
 ## 📡 Sistema Víctima
 Sistema IoT de monitoreo de niveles de ruido en entornos cerrados o pequeñas áreas urbanas. Utiliza sensores conectados a microcontroladores ESP32 con conectividad Wi-Fi y LoRa, enviando los datos a una base de datos en la nube. El acceso a la información se realiza a través de un dashboard web, desde donde se configuran umbrales de alerta y se visualizan datos históricos.
 
-## 🎯 Objetivo del Ataque
+## Objetivo del Ataque
 El objetivo de este ataque es doble: por un lado, sabotear la confiabilidad del sistema de monitoreo acústico para generar desconfianza en clientes institucionales, comprometiendo la integridad de sus mediciones y su reputación; por el otro, capturar y exfiltrar datos acústicos sensibles que podrían ser utilizados en campañas de extorsión o espionaje industrial. La premisa parte del supuesto de que los datos de ruido pueden ser correlacionados con actividad humana o patrones que revelen dinámicas internas de organizaciones. Además, se busca mantener persistencia dentro del sistema comprometido para preparar futuros ataques.
 
-## 💥 Resolución del Ataque: Cyber Kill Chain
+## Resolución del Ataque: Cyber Kill Chain
 
-## 💥 Resolución del Ataque: Cyber Kill Chain
+## Resolución del Ataque: Cyber Kill Chain
 
 ### 1️⃣ Reconnaissance (Reconocimiento)
 Se explora documentación pública, redes sociales y GitHub en busca de información del equipo técnicopara identificar las tecnologías utilizadas (ESP32, JWT), correos electrónicos y endpoints accesibles. Esto va a permitir perfilar objetivos concretos para spear phishing y entender la arquitectura del sistema.
@@ -86,7 +86,7 @@ Alterar los dashboards públicos del sistema para mostrar datos alarmantes falso
   - T1565.002 – Data Manipulation: Transmitted Data Manipulation  
     https://attack.mitre.org/techniques/T1565/002/
 
-## 🔀 Diagrama de Flujo del Ataque
+## Diagrama de Flujo del Ataque
 (El diagrama se incluirá en una versión posterior en formato gráfico)
 
 1. [Reconocimiento: OSINT + Infraestructura]
@@ -103,6 +103,6 @@ Alterar los dashboards públicos del sistema para mostrar datos alarmantes falso
          ⬇
 7. [Sabotaje + extorsión + exfiltración acústica]
 
-## 🧠 Conclusión
+## Conclusión
 Este ataque revela la importancia de implementar autenticación robusta, validación de datos, cifrado de extremo a extremo y control de acceso por niveles. A través de vulnerabilidades aparentemente menores, fue posible comprometer por completo un sistema crítico de monitoreo ambiental. La manipulación de datos acústicos no solo generó caos y desconfianza, sino que abrió la puerta a campañas de espionaje, sabotaje y extorsión. Un sistema confiable requiere una seguridad diseñada desde el inicio.
 
