@@ -53,7 +53,7 @@ Ingresar con el JWT al sistema, modificar umbrales de ruido y alterar registros 
   "dB_level": 98,
   "location": "Hospital X - Terapia Intensiva",
   "alert": true
-}
+} ```
 
 - **Técnicas ATT&CK utilizadas:**
   - T1078 – Valid Accounts  
