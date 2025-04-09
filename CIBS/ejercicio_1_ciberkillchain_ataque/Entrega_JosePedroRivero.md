@@ -54,8 +54,7 @@ Ingresar con el JWT al sistema, modificar umbrales de ruido y alterar registros 
   "location": "Hospital X - Terapia Intensiva",
   "alert": true
 }
-
-
+```
 - **Técnicas ATT&CK utilizadas:**
   - T1078 – Valid Accounts  
     https://attack.mitre.org/techniques/T1078/
