@@ -14,8 +14,6 @@ El objetivo de este ataque es doble: por un lado, sabotear la confiabilidad del 
 
 ## Resolución del Ataque: Cyber Kill Chain
 
-## Resolución del Ataque: Cyber Kill Chain
-
 ### 1️⃣ Reconnaissance (Reconocimiento)
 Se explora documentación pública, redes sociales y GitHub en busca de información del equipo técnicopara identificar las tecnologías utilizadas (ESP32, JWT), correos electrónicos y endpoints accesibles. Esto va a permitir perfilar objetivos concretos para spear phishing y entender la arquitectura del sistema.
 
@@ -25,7 +23,7 @@ Se explora documentación pública, redes sociales y GitHub en busca de informac
   - T1593 – Search Open Websites/Domains  
     https://attack.mitre.org/techniques/T1593/
     
-### 2️⃣ Weaponization (Armado del Ataque)
+### 2️⃣ Weaponization 
 
 Clono la interfaz del dashboard y preparo correos electrónicos con enlaces maliciosos personalizados con el objetivo de descubrir si algunas variables sensibles del sistema se pasaan en la URL, obtener pistas sobre su comportamiento interno y facilitar la creación de señuelos creíbles.
 
@@ -35,7 +33,7 @@ Clono la interfaz del dashboard y preparo correos electrónicos con enlaces mali
   - CWE-598 – Information Exposure Through Query Strings in GET Request  
     https://cwe.mitre.org/data/definitions/598.html
 
-### 3️⃣ Delivery (Entrega del Ataque)
+### 3️⃣ Delivery 
 
 Distribuir los correos usando SMTP anónimo y campañas dirigidas. Esperar que uno de los operadores caiga en el señuelo y entregue sus credenciales. Esto permitira obtener un token JWT válido para acceder al backend como usuario legítimo.
 
@@ -44,7 +42,18 @@ Distribuir los correos usando SMTP anónimo y campañas dirigidas. Esperar que u
     https://attack.mitre.org/techniques/T1566/002/
 
 ### 4️⃣ Exploitation (Explotación de la Vulnerabilidad)
-Ingresar con el JWT al sistema, modificar umbrales de ruido y alterar registros históricos. Si no se tiene firma digital ni validación de origen en los datos se pude inyectar eventos falsos que simulaban problemas acústicos graves, especialmente en instituciones clave.
+Ingresar con el JWT al sistema, modificar umbrales de ruido y alterar registros históricos. Si no se tiene firma digital ni validación de origen en los datos se pude inyectar eventos falsos que simulan problemas acústicos graves, especialmente en instituciones clave.
+
+### Payload Malicioso para Manipular Registros de Ruido
+
+```json
+{
+  "sensor_id": "node-3",
+  "timestamp": "2025-04-01T12:00:00Z",
+  "dB_level": 98,
+  "location": "Hospital X - Terapia Intensiva",
+  "alert": true
+}
 
 - **Técnicas ATT&CK utilizadas:**
   - T1078 – Valid Accounts  
@@ -58,6 +67,10 @@ Ingresar con el JWT al sistema, modificar umbrales de ruido y alterar registros 
 
 ### 5️⃣ Installation (Persistencia)
 Instalar una web shell PHP en el servidor backend usando una vulnerabilidad en la API. Luego programar tareas periódicas (cron) para restaurar la puerta trasera y asegurarme de que sobreviviera a reinicios o intentos de remediación.
+
+@reboot /usr/bin/python3 /var/backups/refresh_backdoor.py
+
+Este cronjob se instala en el sistema víctima para asegurar que la puerta trasera (webshell o script de control) se ejecute automáticamente cada vez que el servidor se reinicie.
 
 - **Técnicas ATT&CK utilizadas:**
   - T1053.003 – Scheduled Task/Job: Cron  
@@ -103,6 +116,14 @@ Alterar los dashboards públicos del sistema para mostrar datos alarmantes falso
          ⬇
 7. [Sabotaje + extorsión + exfiltración acústica]
 
-## Conclusión
-Este ataque revela la importancia de implementar autenticación robusta, validación de datos, cifrado de extremo a extremo y control de acceso por niveles. A través de vulnerabilidades aparentemente menores, fue posible comprometer por completo un sistema crítico de monitoreo ambiental. La manipulación de datos acústicos no solo generó caos y desconfianza, sino que abrió la puerta a campañas de espionaje, sabotaje y extorsión. Un sistema confiable requiere una seguridad diseñada desde el inicio.
+## 💡 Inspiración del Ataque
 
+Este ataque toma inspiración en campañas reales de sabotaje y espionaje industrial como STUXNET, donde un sistema autónomo y aislado fue manipulado mediante vectores físicos y digitales para afectar procesos industriales críticos. Aunque el sistema víctima en este caso se limita a monitoreo ambiental, sus datos pueden representar patrones de comportamiento humano y rutinas organizacionales, lo que lo convierte en una fuente de inteligencia pasiva valiosa.
+
+
+## Conclusión
+Este ataque revela la importancia de implementar autenticación robusta, validación de datos, cifrado de extremo a extremo y control de acceso por niveles. A través de vulnerabilidades aparentemente menores, fue posible comprometer por completo un sistema crítico de monitoreo ambiental.
+
+También fue un desafío narrar el ataque desde una lógica realista y secuencial, utilizando el enfoque de la Cyber Kill Chain, que permitió visualizar cómo un incidente de seguridad puede evolucionar etapa por etapa, hasta escalar en consecuencias que afectan a usuarios, instituciones y entornos sociales.
+
+Este ejercicio ayuda a mirar los proyectos con una mirada más crítica y consciente: cada línea de código, cada endpoint, cada sensor, puede convertirse en un punto de entrada si no se lo protege adecuadamente. 
