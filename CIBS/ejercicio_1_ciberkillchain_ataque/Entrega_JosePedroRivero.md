@@ -55,6 +55,7 @@ Ingresar con el JWT al sistema, modificar umbrales de ruido y alterar registros 
   "alert": true
 }
 
+
 - **Técnicas ATT&CK utilizadas:**
   - T1078 – Valid Accounts  
     https://attack.mitre.org/techniques/T1078/
