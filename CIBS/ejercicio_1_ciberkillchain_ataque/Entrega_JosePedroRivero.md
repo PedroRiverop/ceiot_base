@@ -6,7 +6,7 @@
 **Universidad:** Universidad de Buenos Aires (UBA)  
 **Año:** 2025  
 
-## 📡 Sistema Víctima
+## Sistema Víctima
 Sistema IoT de monitoreo de niveles de ruido en entornos cerrados o pequeñas áreas urbanas. Utiliza sensores conectados a microcontroladores ESP32 con conectividad Wi-Fi y LoRa, enviando los datos a una base de datos en la nube. El acceso a la información se realiza a través de un dashboard web, desde donde se configuran umbrales de alerta y se visualizan datos históricos.
 
 ## Objetivo del Ataque
