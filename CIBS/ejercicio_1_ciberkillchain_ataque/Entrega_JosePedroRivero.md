@@ -29,6 +29,7 @@ Realizo un análisis de superficie a través de fuentes abiertas:
   https://attack.mitre.org/techniques/T1593/  
 - T1592.002 – Gather Victim Identity Information: Email Addresses
   https://attack.mitre.org/techniques/T1589/002/
+  
   ---  
     
 ### 2️⃣ Weaponization 
@@ -44,6 +45,7 @@ Con la información recolectada:
   https://attack.mitre.org/techniques/T1608/001/  
 - CWE-434 – Unrestricted File Upload
   https://cwe.mitre.org/data/definitions/434.html
+  
   ---
 
 ### 3️⃣ Delivery 
@@ -68,6 +70,7 @@ Este payload es aceptado por el backend debido a validaciones débiles del esque
   https://attack.mitre.org/techniques/T1203/
 - T1059.006 – Command and Scripting Interpreter: Python
   https://attack.mitre.org/techniques/T1059/006/
+  
   ---
 
 ### 4️⃣ Exploitation 
@@ -80,8 +83,8 @@ Inserto un hook en el proceso que maneja las mediciones entrantes para duplicar 
   https://attack.mitre.org/techniques/T1055/001/
 - T1565.001 – Data Manipulation: Stored Data Manipulation
   https://attack.mitre.org/techniques/T1565/001/
+  
   ---
-
 
 ### 5️⃣ Installation 
 Creo una tarea `cron` en el servidor comprometido:
@@ -99,6 +102,7 @@ Además, inserto un nuevo usuario en MongoDB con nombre `admin_support2`, que se
   https://attack.mitre.org/techniques/T1053/003/ 
 - T1136.001 – Create Account: Local Account
   https://attack.mitre.org/techniques/T1136/001/
+  
   ---
 
 ### 6️⃣ Command & Control (C2)
@@ -112,8 +116,8 @@ El script evalúa condiciones antes de ejecutar: sólo se activa en horas de baj
   https://attack.mitre.org/techniques/T1071/001/
 - T1095 – Non-Application Layer Protocol
   https://attack.mitre.org/techniques/T1095/
+  
   --- 
-
 
 ### 7️⃣ Actions on Objectives 
 
@@ -145,6 +149,7 @@ Preparo una campaña de extorsión sugiriendo que los datos podrían publicarse 
 6. C2 con horarios programados
          ⬇
 7. Exfiltración cifrada y controlada
+   
    ---
 
 ## 💡 Inspiración del Ataque
