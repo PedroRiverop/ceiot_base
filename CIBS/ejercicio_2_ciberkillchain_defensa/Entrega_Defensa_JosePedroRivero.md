@@ -26,53 +26,56 @@ Diseñar una estrategia de defensa efectiva, basada en medidas clave de detecci�
 - **Cifrado de datos en reposo con claves rotativas.**
 - **Límites por volumen de datos por endpoint.**
 
-**MITRE Mitigation: M1041 – Encrypt Sensitive Information**  
-**MITRE Mitigation: M1037 – Filter Network Traffic**
+**MITRE Mitigation: M1041 – Encrypt Sensitive Information**  https://attack.mitre.org/mitigations/M1041/
+**MITRE Mitigation: M1037 – Filter Network Traffic** https://attack.mitre.org/mitigations/M1037/
 
 ---
 
 ## 6️⃣ Command & Control (C2)
 
 ### Detección:
-- **Monitoreo de conexiones salientes periódicas.**
+- **Monitoreo de conexiones salientes periódicas.** Revisamos si hay conexiones salientes en horarios raros
 - **Frecuencia de conexión:** detectar si un nodo se conecta más veces de lo habitual.
 
 ### Mitigación:
-- **Lista blanca de destinos salientes.**
+- **Lista blanca de destinos salientes.** Solo IPs o dominios de confianza
 - **Timeout adaptativo.**
 
- **MITRE Mitigation: M1037 – Filter Network Traffic**  
- **MITRE Mitigation: M1040 – Behavior Prevention on Endpoint**
+ **MITRE Mitigation: M1037 – Filter Network Traffic**  https://attack.mitre.org/mitigations/M1037/
+ Vuelve a ser adecuada. Controlar destinos e IP evita que el malware se comunique con su servidor de C2.
+ 
+ **MITRE Mitigation: M1040 – Behavior Prevention on Endpoint** https://attack.mitre.org/mitigations/M1040/
 
 ---
 
-## 5️⃣ Installation (Persistencia)
+## 5️⃣ Installation
 
 ### Detección:
-- **Alertas ante creación de usuarios o cambios en roles de MongoDB.**
+- **Alertas ante creación de usuarios o cambios en roles de MongoDB.** 
 
 ### Mitigación:
-- **Revisión de tareas programadas (`cron`) con hash de integridad.**
+- **Revisión de tareas programadas (`cron`) con hash de integridad.** Comparamos los archivos críticos con hashes de integridad para ver si cambiaron.
 - **Auditoría periódica de cuentas activas.**
 
- **MITRE Mitigation: M1018 – User Account Management**  
- **MITRE Mitigation: M1047 – Audit**
+ **MITRE Mitigation: M1018 – User Account Management**  https://attack.mitre.org/mitigations/M1018/
+ **MITRE Mitigation: M1047 – Audit**  https://attack.mitre.org/mitigations/M1047/
 
 ---
 
 ## 4️⃣ Exploitation
 
 ### Detección:
-- **Verificación de integridad en scripts backend clave.**
+- **Verificación de integridad en scripts backend clave.** Verificar si los archivos del backend fueron modificados
 - **Integración continua con Git para detectar cambios no autorizados.**
 
 ### Mitigación:
 - **Validaciónes estricta del esquema JSON.**
-- **Firmado digital de scripts backend.**
+- **Firmado digital de scripts backend.** Si se intenta enviar un JSON con campos adicionales (como extra), se rechaza.
 
- **MITRE Mitigation: M1021 – Restrict Web-Based Content**  
- **MITRE Mitigation: M1047 – Audit**
-
+ **MITRE Mitigation: M1021 – Restrict Web-Based Content**  https://attack.mitre.org/mitigations/M1021/
+ **MITRE Mitigation: M1047 – Audit** https://attack.mitre.org/mitigations/M1047/
+  Detectar cambios en scripts clave a través de auditoría.
+  
 ---
 
 ## 3️⃣ Delivery
@@ -82,10 +85,9 @@ Diseñar una estrategia de defensa efectiva, basada en medidas clave de detecci�
 
 ### Mitigación:
 - **Restricción por tipo y extensión en endpoints.**
-- **Sandbox de archivos antes de ejecutarlos.**
+- **Sandbox de archivos antes de ejecutarlos.** Implementamos un sandbox que prueba los archivos antes de aplicarlos.
 
- **MITRE Mitigation: M1026 – Privileged Account Management**  
- **MITRE Mitigation: M1040 – Behavior Prevention on Endpoint**
+ 
 
 ---
 
@@ -97,21 +99,20 @@ Diseñar una estrategia de defensa efectiva, basada en medidas clave de detecci�
 ### Mitigación:
 - **Deshabilitar rutas no necesarias.**
 
- **MITRE Mitigation: M1021 – Restrict Web-Based Content**
+ **MITRE Mitigation: M1021 – Restrict Web-Based Content** https://attack.mitre.org/mitigations/M1021/
 
 ---
 
 ## 1️⃣ Reconnaissance
 
 ### Detección:
-- **Logs de acceso a rutas públicas + detección de scrapers.**
+- **Logs de acceso a rutas públicas + detección de scrapers.** Ver si hay herramientas automáticas accediendo (como curl, whatweb, bots)
 
 ### Mitigación:
 - **Ocultar detalles técnicos en documentación pública.**
 - **Rate limiting.**
-
- **MITRE Mitigation: M1040 – Behavior Prevention on Endpoint**  
- **MITRE Mitigation: M1036 – Limit Access to Resource Over Network**
+ 
+ **MITRE Mitigation: M1036 – Limit Access to Resource Over Network** https://attack.mitre.org/mitigations/M1035/
 
 ---
 
