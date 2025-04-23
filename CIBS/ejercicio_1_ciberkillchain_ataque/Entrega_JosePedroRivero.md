@@ -29,6 +29,8 @@ Realizo un análisis de superficie a través de fuentes abiertas:
   https://attack.mitre.org/techniques/T1593/  
 - T1592.002 – Gather Victim Identity Information: Email Addresses
   https://attack.mitre.org/techniques/T1589/002/
+- T1596.001 - Search Open Technical Databases: DNS/Passive DNS
+  https://attack.mitre.org/techniques/T1596/001/
   
   ---  
     
@@ -45,6 +47,8 @@ Con la información recolectada:
   https://attack.mitre.org/techniques/T1608/001/  
 - CWE-434 – Unrestricted File Upload
   https://cwe.mitre.org/data/definitions/434.html
+- T1587.001 - Develop Capabilities: Malware
+  https://attack.mitre.org/techniques/T1587/001/
   
   ---
 
@@ -150,7 +154,6 @@ Preparo una campaña de extorsión sugiriendo que los datos podrían publicarse 
          ⬇
 7. Exfiltración cifrada y controlada
    
-   ---
 
 ## 💡 Inspiración del Ataque
 
